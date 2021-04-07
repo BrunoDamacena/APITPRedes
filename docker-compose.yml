@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    api:
+      build: .
+      volumes:
+        - ./logs:/app/logs
+      networks:
+        net:
+          aliases:
+            - api
+    nginx:
+      restart: always
+      image: nginx:latest
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+        - 81:80
+      networks:
+        - net
+networks:
+  net:
