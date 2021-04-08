@@ -10,7 +10,11 @@ from flask import Flask, make_response, jsonify
 from flask.logging import default_handler
 from werkzeug.exceptions import HTTPException
 
-import controllers.controller as controller
+import controllers.moisture_controller as moisture_controller
+from exceptions.conflict_exception import ConflictException
+from exceptions.invalid_parameter_exception import InvalidParameterException
+from exceptions.missing_parameter_exception import MissingParameterException
+from exceptions.not_found_exception import NotFoundException
 from utils.json_encoder import ComplexEncoder
 from utils.request_formatter import RequestFormatter
 
@@ -28,7 +32,7 @@ HANDLER.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.INFO, handlers=[HANDLER])
 
 # register blueprints with controllers for simulation, robot and dinosaur
-APP.register_blueprint(controller.BP, url_prefix='/example_route')
+APP.register_blueprint(moisture_controller.BP, url_prefix='/moisture/<chat_id>')
 
 
 @APP.after_request
@@ -50,6 +54,16 @@ def handle_exception(exception):
     :return:
     """
     APP.logger.exception(exception)
+    if isinstance(exception, HTTPException):
+        return make_response(jsonify(description=str(exception)), exception.code)
+    if isinstance(exception, MissingParameterException):
+        return make_response(jsonify(description=str(exception)), 400)
+    if isinstance(exception, NotFoundException):
+        return make_response(jsonify(description=str(exception)), 404)
+    if isinstance(exception, ConflictException):
+        return make_response(jsonify(description=str(exception)), 409)
+    if isinstance(exception, InvalidParameterException):
+        return make_response(jsonify(description=str(exception)), 422)
     return make_response(jsonify(description=str(exception)), 500)
 
 
