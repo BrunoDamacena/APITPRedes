@@ -10,7 +10,7 @@ from flask import Flask, make_response, jsonify
 from flask.logging import default_handler
 from werkzeug.exceptions import HTTPException
 
-import controllers.moisture_controller as moisture_controller
+import controllers.sensor_controller as sensor_controller
 from exceptions.conflict_exception import ConflictException
 from exceptions.invalid_parameter_exception import InvalidParameterException
 from exceptions.missing_parameter_exception import MissingParameterException
@@ -32,7 +32,7 @@ HANDLER.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.INFO, handlers=[HANDLER])
 
 # register blueprints with controllers for simulation, robot and dinosaur
-APP.register_blueprint(moisture_controller.BP, url_prefix='/moisture/<chat_id>')
+APP.register_blueprint(sensor_controller.BP, url_prefix='/sensor')
 
 
 @APP.after_request
