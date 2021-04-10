@@ -3,3 +3,4 @@ gunicorn==19.9.0
 Werkzeug==0.15.5
 python-telegram-bot
 python-dotenv
+pandas
