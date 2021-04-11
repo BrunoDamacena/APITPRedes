@@ -1,5 +1,6 @@
 import pandas as pd
 from exceptions.not_found_exception import NotFoundException
+from exceptions.invalid_parameter_exception import InvalidParameterException
 
 data_path = "data/data.csv"
 cols = ["sensor_id", "sensor_name", "chat_id"]
@@ -16,7 +17,7 @@ def getRegister():
 def saveRegister(sensorId, sensorName, chadId):
 
     if checkRegister(str(sensorId)):
-        return str(sensorId) + " already registered!"
+        raise InvalidParameterException(str(sensorId) + " already registered!")
 
     register = pd.DataFrame({
         'sensor_id': [str(sensorId)],
