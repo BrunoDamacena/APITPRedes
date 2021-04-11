@@ -6,15 +6,19 @@ from flask import make_response, jsonify, Blueprint, request
 
 import services.sensor_service as sensor_service
 from exceptions.missing_parameter_exception import MissingParameterException
-
+import utils.csv.repository as repository
 BP = Blueprint('sensor', __name__)
+
 
 @BP.route('/register', methods=["POST"], strict_slashes=False)
 def register_your_plant():
     body = request.json
     if body is None or "sensor_id" not in body or "sensor_name" not in body or "chat_id" not in body:
-        raise MissingParameterException("Body params missing. Required: [sensor_id, sensor_name, chat_id]")
-    # from_csv.save(body["sensor_id"], body["sensor_name"], body["chat_id"])
+        raise MissingParameterException(
+            "Body params missing. Required: [sensor_id, sensor_name, chat_id]")
+
+    repository.saveRegister(
+        body["sensor_id"], body["sensor_name"], body["chat_id"])
 
     return make_response(jsonify("success"), 200)
 
@@ -23,14 +27,16 @@ def register_your_plant():
 def moisture_your_plant():
     body = request.json
     if body is None or "sensor_id" not in body or "umidade" not in body:
-        raise MissingParameterException("Body params missing. Required: [sensor_id, umidade]")
+        raise MissingParameterException(
+            "Body params missing. Required: [sensor_id, umidade]")
 
-    # Get the chat_id and the sensor_name from the CSV "database"
-    # chat_id = from_csv.getChatId(body["sensor_id"])
-    # sensor_name = from_csv.getSensorName(body["sensor_id"])
+    # Setar valor de umidade de disparo e criar sendMessageViaTelegramBot
 
-    # Send the message to the right user via Telegram Bot!
-    # message = "O sensor" + sensor_name + " precisa ser regado!"
-    # sendMessageViaTelegramBot(chat_id, message)
+    # row = repository.readRegister(body["sensor_id"])
+
+    # if (umidade == NAO_UMIDO):  # Send the message to the right user via Telegram Bot!
+    # Disparar telagran aqui
+    # message = "O sensor" + row['sensor_name'] + " precisa ser regado!"
+    # sendMessageViaTelegramBot(row['chat_id'], message)
 
     return make_response(jsonify("success"), 200)
