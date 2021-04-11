@@ -5,6 +5,7 @@ Module with Flask routes
 from flask import make_response, jsonify, Blueprint, request
 
 import services.sensor_service as sensor_service
+import services.telegram_service as telegram_service
 from exceptions.missing_parameter_exception import MissingParameterException
 
 
