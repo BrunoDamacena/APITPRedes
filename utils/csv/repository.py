@@ -1,26 +1,52 @@
 import pandas as pd
+from exceptions.not_found_exception import NotFoundException
+
+data_path = "data/data.csv"
+cols = ["sensor_id", "sensor_name", "chat_id"]
+
+def getRegister(): 
+    try:
+        data_csv = pd.read_csv(data_path, usecols=cols, )
+    except FileNotFoundError:
+        data_csv = pd.DataFrame(columns=cols)
+        data_csv.to_csv(data_path, index=False)
+    return data_csv
 
 
 def saveRegister(sensorId, sensorName, chadId):
-    df = pd.DataFrame({
-        'sensor_id': [sensorId],
-        'sensor_name': [sensorName],
-        'chat_id': [chadId]
+
+    if checkRegister(str(sensorId)):
+        return str(sensorId) + " already registered!"
+
+    register = pd.DataFrame({
+        'sensor_id': [str(sensorId)],
+        'sensor_name': [str(sensorName)],
+        'chat_id': [str(chadId)]
     })
+    
+    register.to_csv(data_path, mode='a', header=False, index=False)
 
-    df.to_csv('data.csv', mode='a', header=False, index=False)
-
-    return df.tail(1)
+    return str(sensorId) + " registered successfully!"
 
 
 def readRegister(sensorId):
-    df = pd.read_csv("data.csv", usecols=[
-                     "sensor_id", "sensor_name", "chat_id"])
+    data_csv = getRegister()
+    queryRes = data_csv.query('sensor_id=="' + str(sensorId) + '"').head(1)
 
-    queryRes = df.query('sensor_id=="' + sensorId + '"').head(1)
+    if queryRes.empty:
+        raise NotFoundException("Sensor " + str(sensorId) + " not found!")
 
     return {
         'sensor_id': queryRes.values[0][0],
         'sensor_name': queryRes.values[0][1],
         'chat_id': queryRes.values[0][2]
     }
+
+# tried to make a oneliner but I failed miserably
+def checkRegister(sensorId: str):
+    data_csv = getRegister()
+    for sensor_id in data_csv.sensor_id:
+        if str(sensor_id) == sensorId:
+            return True
+
+    return False
